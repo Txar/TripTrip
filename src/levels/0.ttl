@@ -1,0 +1,53 @@
+palette start
+0 spawn
+1 tile
+2 none
+3 wall
+4 start
+palette end
+properties start
+width 128
+height 40
+properties end
+layout start
+128x1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+1 126x2 1
+128x1
+layout end
