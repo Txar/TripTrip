@@ -4,6 +4,7 @@ palette start
 2 none
 3 wall
 4 start
+5 spike
 palette end
 properties start
 width 128
@@ -46,7 +47,7 @@ layout start
 1 126x2 1
 1 126x2 1
 1 126x2 1
-1 126x2 1
+1 5x2 0 120x2 1
 1 126x2 1
 1 126x2 1
 128x1

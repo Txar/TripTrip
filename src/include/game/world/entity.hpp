@@ -1,13 +1,17 @@
+#pragma once
+
 #include "SFML/Graphics.hpp"
 #include "game/graphics/animator.hpp"
 #include "block.hpp"
-
-#pragma once
+#include "game/io/debug.hpp"
 
 namespace wrld {
     float camera_x = 0;
     float camera_y = 0;
     int fps;
+
+    bool player_is_alive = false;
+
     sf::Vector2f camera_center;
 
     const float G = 1.0;
@@ -18,7 +22,7 @@ namespace wrld {
 
 class entity {
     public:
-        void actOnEvents() {
+        virtual void actOnEvents() {
             
         }
 

@@ -24,3 +24,7 @@ debug de;
 void print(std::string line) {
     de.line(line);
 }
+
+void print(int number) {
+    de.line(std::to_string(number));
+}

@@ -31,7 +31,7 @@ class box_entity : public entity {
         }
 
     public:
-        void actOnEvents() {
+        virtual void actOnEvents() {
             
         }
 

@@ -17,6 +17,12 @@ class animator {
         bool reverse = false;
         bool flipSprite = false;
 
+        sf::Vector2f scaling = {1.0, 1.0};
+
+        void setScaling(float x, float y) {
+            scaling = {x, y};
+        }
+
         animator(std::string _name) {
             name = _name;
             animated = false;
@@ -61,11 +67,10 @@ class animator {
         }
 
         sf::Sprite getSprite() {
-            if (animated) {
-                return texture_mgr.get_sprite(name, frame, width, height, flipSprite);
-            }
-            else {
-                return texture_mgr.get_sprite(name, flipSprite);
-            }
+            sf::Sprite s;
+            if (animated) s = texture_mgr.get_sprite(name, frame, width, height, flipSprite);
+            else s = texture_mgr.get_sprite(name, flipSprite);
+            s.setScale(scaling);
+            return s;
         }
 };

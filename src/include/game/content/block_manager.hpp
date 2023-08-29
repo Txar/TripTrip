@@ -8,8 +8,10 @@ class block_manager {
         block ***tilemap;
         block none;
 
-        const std::string level_directory = "assets/levels";
-        const std::string level_extension = ".tll";
+        const std::string level_directory = "assets/levels/";
+        const std::string level_extension = ".ttl";
+
+        sf::Vector2i player_spawn = {512, 512};
 
         std::string level_filename(std::string level_name) {
             return level_directory + level_name + level_extension;
@@ -39,21 +41,24 @@ class block_manager {
 
             if (load) {
                 block _none("none");
+
                 block tile("tile");
+                tile.anim.setScaling(4.0, 4.0);
+
                 block wall("wall");
+                wall.anim.setScaling(4.0, 4.0);
+                wall.solid = false;
+
+                block spawn("spawn");
+                spawn.visible = false;
+                spawn.solid = false;
+
+                add_block(&spawn);
                 add_block(&_none);
                 add_block(&tile);
                 add_block(&wall);
 
-                for (int i = 0; i < wrld::WORLD_WIDTH; i++) {
-                    tilemap[i] = new block *[wrld::WORLD_HEIGHT];
-                    for (int j = 0; j < wrld::WORLD_HEIGHT; j++) {
-                        tilemap[i][j] = &none;
-                        if (i == 0 || j == 5 || (j == 2 && i > 7)) {
-                            tilemap[i][j] = get_ptr("test_anim");
-                        }
-                    }
-                }
+                load_level("0");
             }
         }
 
@@ -74,15 +79,18 @@ class block_manager {
             for (char c : b) {
                 if (c == 'x') {
                     count++;
-                    result[count] = std::stoi(num);
+                    result[0] = std::stoi(num);
                     num = "";
                 } else {
                     num += c;
                 }
             }
+            result[1] = std::stoi(num);
             if (count == 0) {
-                result[1] = result[0];
+                result[1] = std::stoi(num);
+                result[0] = 1;
             }
+
             return result;
         }
 
@@ -92,9 +100,8 @@ class block_manager {
             std::ifstream f;
             f.open(level_filename(level_name));
 
-            int width, height;
             std::string buffer;
-            std::string prev;
+            std::string prev = "";
             std::string status = "none";
 
             std::map<std::string, std::string> palette;
@@ -108,25 +115,46 @@ class block_manager {
                     status = prev;
                 } else if (buffer == "end") {
                     status = "none";
+                } else if (buffer == "palette" || buffer == "properties" || buffer == "layout") {
+
                 } else if (status != "none" && pair) {
                     if (status == "palette") {
-                        palette.insert(prev, buffer);
+                        palette.insert({prev, buffer});
                     } else if (status == "properties") {
-                        properties.insert(prev, buffer);
+                        properties.insert({prev, buffer});
                     }
                 } else if (status != "none") {
                     if (status == "layout") {
-                        
+                        int *b = decompress_blocks(buffer);
+                        std::cout << buffer << " ";
+                        for (int i = 0; i < b[0]; i++) {
+                            layout.push_back(b[1]);
+                        }
+                        pair = true;
                     }
                 }
-
                 pair = !pair;
+                prev = buffer;
             }
 
-            for (int i = 0; i < wrld::WORLD_WIDTH; i++) {
-                tilemap[i] = new block *[wrld::WORLD_HEIGHT];
-                for (int j = 0; j < wrld::WORLD_HEIGHT; j++) {
+            wrld::WORLD_WIDTH = std::stoi(properties.at("width"));
+            wrld::WORLD_HEIGHT = std::stoi(properties.at("height"));
 
+            std::cout << layout.size() << "\n";
+
+            int count = 0;
+            for (int i = 0; i < wrld::WORLD_WIDTH; i++) {
+
+                tilemap[i] = new block *[wrld::WORLD_HEIGHT];
+                std::cout << "\n";
+                for (int j = 0; j < wrld::WORLD_HEIGHT; j++) {
+                    block *b = get_ptr(palette.at(std::to_string(layout.at((j * wrld::WORLD_WIDTH) + i))));
+
+                    if (b->name == "spawn") player_spawn = {i * wrld::BLOCK_SIZE, j * wrld::BLOCK_SIZE};
+
+                    tilemap[i][j] = b;
+                    count++;
+                    //std::cout << b->name[0] << " ";
                 }
             }
 

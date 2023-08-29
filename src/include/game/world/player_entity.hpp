@@ -12,7 +12,7 @@ class player_entity : public box_entity {
     protected:
 
     public:
-        void actOnEvents() {
+        virtual void actOnEvents() {
             srvr::event e;
             pressingRight = false, pressingLeft = false, pressingJump = false;
             while (srvr::eventPool.iter(&e)) {

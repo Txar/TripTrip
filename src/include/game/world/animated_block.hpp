@@ -1,6 +1,6 @@
-#include "block.hpp"
-
 #pragma once
+
+#include "block.hpp"
 
 class animated_block : public block {
     public:

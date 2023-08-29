@@ -112,10 +112,21 @@ class world {
             }
         }
 
-        void resetCamera() {
+        void resetCamera(int screen_width, int screen_height) {
             wrld::camera_center = {float(alive_entity_mgr.get_ptr(em::player_name)->x), 
                                    float(alive_entity_mgr.get_ptr(em::player_name)->y)};
             wrld::camera_x = wrld::camera_center.x;
             wrld::camera_y = wrld::camera_center.y;
+
+            if (wrld::camera_x - screen_width/2 < 0) {
+                wrld::camera_x = screen_width/2;
+            } else if (wrld::camera_x + screen_width/2 > wrld::WORLD_WIDTH * wrld::BLOCK_SIZE) {
+                wrld::camera_x = wrld::WORLD_WIDTH * wrld::BLOCK_SIZE - screen_width/2;
+            }
+            if (wrld::camera_y - screen_height/2 < 0) {
+                wrld::camera_y = screen_height/2;
+            } else if (wrld::camera_y + screen_height/2 > wrld::WORLD_HEIGHT * wrld::BLOCK_SIZE) {
+                wrld::camera_y = wrld::WORLD_HEIGHT * wrld::BLOCK_SIZE - screen_height/2;
+            }
         }
 };

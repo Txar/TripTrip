@@ -1,13 +1,14 @@
+#pragma once
+
 #include "SFML/Graphics.hpp"
 #include "game/graphics/animator.hpp"
-
-#pragma once
+#include "game/io/debug.hpp"
 
 namespace wrld {
     const int BLOCK_SIZE = 64;
 
-    const int WORLD_WIDTH = 128;
-    const int WORLD_HEIGHT = 128;
+    int WORLD_WIDTH = 128;
+    int WORLD_HEIGHT = 128;
 }
 
 class block {

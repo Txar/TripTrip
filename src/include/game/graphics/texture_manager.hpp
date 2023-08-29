@@ -2,6 +2,8 @@
 
 class texture_manager {
     public:
+        float onload_scaling = 1.0;
+
         texture_manager() {
 
         };
@@ -34,11 +36,25 @@ class texture_manager {
 
         bool load(std::string texture_name) {
             sf::Texture t;
-            bool success = t.loadFromFile(textures_path + "/" + texture_name + ".png");
-            if (!success) {
-                success = t.loadFromFile(textures_path + "/" + missing_texture_name + ".png");
+            bool success = true;
+            if (texture_name == "none") t.loadFromFile(textures_path + "/none.png");
+            else {
+                success = t.loadFromFile(textures_path + "/" + texture_name + ".png");
+                if (!success) {
+                    success = t.loadFromFile(textures_path + "/" + missing_texture_name + ".png");
+                }
             }
-            textures.insert(std::pair<std::string, sf::Texture>(texture_name, t));
+            if (onload_scaling == 1.0) {
+                textures.insert(std::pair<std::string, sf::Texture>(texture_name, t));
+            } else {
+                sf::RenderTexture t2;
+                t2.create(t.getSize().x * onload_scaling, t.getSize().y * onload_scaling);
+                sf::Sprite s(t);
+                s.setScale(onload_scaling, onload_scaling);
+                t2.draw(s);
+                t2.display();
+                textures.insert(std::pair<std::string, sf::Texture>(texture_name, t2.getTexture()));
+            }
             return success;
         }
 
