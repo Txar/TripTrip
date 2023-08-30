@@ -7,16 +7,18 @@
 
 class block {
     public:
-        bool visible = true, solid = true, kills = false, animated_collider = false;
+        bool visible = true, solid = true, kills = false, animated_collider = false, draw_shadow = false, is_background = false;
         std::string name;
         animator anim;
 
-        block(std::string _name = "none") : anim(_name) {
+        block(std::string _name = "none", bool _draw_shadow = false) : anim(_name) {
             name = _name;
+            draw_shadow = _draw_shadow;
             if (name == "none") {
                 visible = false;
                 solid = false;
             }
+            is_background = !solid;
             anim.setScaling(wrld::SCALING, wrld::SCALING);
 
             collider = sf::IntRect(0, 0, wrld::BLOCK_SIZE, wrld::BLOCK_SIZE);

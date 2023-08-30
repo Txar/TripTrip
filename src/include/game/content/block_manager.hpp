@@ -43,9 +43,9 @@ class block_manager {
             if (load) {
                 block _none("none");
 
-                block tile("tile");
+                block tile("tile", true);
 
-                block _block("block");
+                block _block("block", true);
 
                 background_block spawn("spawn");
                 spawn.visible = false;
@@ -53,8 +53,63 @@ class block_manager {
                 block spike("spike");
                 spike.kills = true;
 
+                block spike_wall("spike_wall");
+                spike_wall.kills = true;
+                spike_wall.is_background = true;
+                add_block(&spike_wall);
+
                 animated_block fire("fire", 14, 6.0);
                 fire.kills = true;
+
+                animated_block moving_1_0("moving_1_0", 9, 6.0, true, 0);
+                moving_1_0.anim.name = "moving_1";
+                moving_1_0.animated_collider = true;
+                moving_1_0.animatedColliders = {
+                    sf::IntRect(0, 0, 16, 16),
+                    sf::IntRect(2, 0, 14, 16),
+                    sf::IntRect(4, 0, 12, 16),
+                    sf::IntRect(6, 0, 10, 16),
+                    sf::IntRect(8,  0, 8, 16),
+                    sf::IntRect(10, 0, 6, 16),
+                    sf::IntRect(12, 0, 4, 16),
+                    sf::IntRect(14, 0, 2, 16),
+                    sf::IntRect(16, 0, 0, 16)
+                };
+                add_block(&moving_1_0);
+
+                animated_block moving_1_1("moving_1_1", 9, 6.0, true, 1);
+                moving_1_1.anim.name = "moving_1";
+                add_block(&moving_1_1);
+
+                animated_block moving_1_2("moving_1_2", 9, 6.0, true, 2);
+                moving_1_2.anim.name = "moving_1";
+                moving_1_2.animated_collider = true;
+                moving_1_2.animatedColliders = {
+                    sf::IntRect(16, 0, 0, 16),
+                    sf::IntRect(14, 0, 2, 16),
+                    sf::IntRect(12, 0, 4, 16),
+                    sf::IntRect(10, 0, 6, 16),
+                    sf::IntRect(8,  0, 8, 16),
+                    sf::IntRect(6, 0, 10, 16),
+                    sf::IntRect(4, 0, 12, 16),
+                    sf::IntRect(2, 0, 14, 16),
+                    sf::IntRect(0, 0, 16, 16)
+                };
+                add_block(&moving_1_2);
+
+                block bricks("bricks", true);
+                add_block(&bricks);
+
+                block brick_floor("brick_floor", true);
+                add_block(&brick_floor);
+
+                background_block support_left("support_left");
+                add_block(&support_left);
+                background_block support_right("support_right");
+                add_block(&support_right);
+
+                block easter_egg("none");
+                add_block(&easter_egg);
 
                 background_block trash_can("trash_can");
                 background_block wall("wall");
@@ -157,10 +212,11 @@ class block_manager {
 
             wrld::WORLD_WIDTH = std::stoi(properties.at("width"));
             wrld::WORLD_HEIGHT = std::stoi(properties.at("height"));
+            wrld::sound_mgr.loadMusic(properties.at("music"));
+            wrld::sound_mgr.play_music();
 
             int count = 0;
             for (int i = 0; i < wrld::WORLD_WIDTH; i++) {
-
                 tilemap[i] = new block *[wrld::WORLD_HEIGHT];
                 for (int j = 0; j < wrld::WORLD_HEIGHT; j++) {
                     block *b = get_ptr(palette.at(std::to_string(layout.at((j * wrld::WORLD_WIDTH) + i))));
@@ -169,7 +225,6 @@ class block_manager {
 
                     tilemap[i][j] = b;
                     count++;
-                    //std::cout << b->name[0] << " ";
                 }
             }
 

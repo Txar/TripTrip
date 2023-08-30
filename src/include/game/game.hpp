@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -6,8 +8,7 @@
 #include "world/block.hpp"
 #include "content/entity_manager.hpp"
 #include "world/world.hpp"
-
-#pragma once
+#include "game/graphics/ui.hpp"
 
 class game {
     private:
@@ -19,9 +20,11 @@ class game {
         screen_manager screen_mgr;
 
         world w;
+        
+        ui ui_mgr;
     
     public:
-        game(bool _debug = false) : screen_mgr("TripTrip", 1280, 720){
+        game(bool _debug = false) : screen_mgr("TripTrip", 1280, 720), ui_mgr(true) {
             debug = _debug;
         }
         
@@ -39,8 +42,6 @@ class game {
             kb::new_bind(sf::Keyboard::A, "move_left");
             kb::new_bind(sf::Keyboard::D, "move_right");
             kb::new_bind(sf::Keyboard::Space, "jump");
-
-            
 
             clock.restart();
             while (running) {
@@ -71,15 +72,19 @@ class game {
                 screen_mgr.drawBackground();
                 screen_mgr.drawBlocks(w.block_mgr.tilemap); //needs optimization obviously
                 screen_mgr.drawEntities(&w.alive_entity_mgr.entities, draw_colliders);
-                screen_mgr.drawConsole();
+                screen_mgr.drawUI(ui_mgr);
                 w.resetCamera(screen_mgr.screen_width, screen_mgr.screen_height);
                 screen_mgr.moveCamera();
 
+                wrld::sound_mgr.updateVolume();
                 wrld::sound_mgr.play_sounds();
                 em::updateGlobalEvents();
 
-                w.actOnEvents();
-                w.update(delta_time, fps);
+                ui_mgr.update();
+                if (!wrld::paused) {
+                    w.actOnEvents();
+                    w.update(delta_time, fps);
+                }
 
                 running = screen_mgr.update();
             }

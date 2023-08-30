@@ -152,8 +152,9 @@ class world {
         }
 
         void resetCamera(int screen_width, int screen_height) {
-            wrld::camera_center = {float(alive_entity_mgr.get_ptr(em::player_name)->x), 
-                                   float(alive_entity_mgr.get_ptr(em::player_name)->y)};
+            entity *p = alive_entity_mgr.get_ptr(em::player_name);
+            wrld::camera_center = {float(p->x + ((float)p->width / 2)),
+                                   float(p->y + ((float)p->height / 2))};
             wrld::camera_x = wrld::camera_center.x;
             wrld::camera_y = wrld::camera_center.y;
 

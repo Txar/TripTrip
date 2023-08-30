@@ -23,6 +23,7 @@ ifeq ($(OS),Windows_NT)
 	-copy .\src\levels\* build\$(BN)\assets\levels
 	-copy .\src\fonts\* build\$(BN)\assets
 	-copy .\src\sounds\* build\$(BN)\assets
+	-copy .\src\shaders\* build\$(BN)\assets
 	-copy .\src\dlls\* build\$(BN)
 	@echo "Building binaries..."
 	$(CC) -o "build/$(BN)/$(BN).exe" $(SRC) $(CFLAGS) $(INCLUDEPATH) -L src/lib/ -lsfml-network -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
@@ -36,7 +37,8 @@ ifeq ($(UNAME_S),Linux)
 	cp ./src/sprites/export/* ./build/$(BN)/assets/
 	cp ./src/levels/* ./build/$(BN)/assets/levels
 	cp ./src/fonts/* ./build/$(BN)/assets/
-	cp ./src\sounds/* ./build/$(BN)/assets/
+	cp ./src/sounds/* ./build/$(BN)/assets/
+	cp ./src/shaders/* ./build/$(BN)/assets/
 	cp ./src/so/*.so* ./build/$(BN)
 	$(CC) -o ./build/$(BN)/$(BN).bin $(SRC) $(CFLAGS) $(INCLUDEPATH) -lsfml-network -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L./src/so
 endif

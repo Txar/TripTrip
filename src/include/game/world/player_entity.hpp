@@ -46,12 +46,12 @@ class player_entity : public box_entity {
         }
 
         player_entity(std::string name, int _width, int _height, std::string _type = "playerEntity") : box_entity {name, _width, _height, _type} {
-            animators.push_back(animator("none", width, height, 6));
+            animators.push_back(animator("none", 32, 32, 6));
             colliders = {
-                {{0, 16, 8, height - 32}, false}, //left
-                {{width - 8, 16, 8, height - 32}, false}, //right
-                {{16, 0, width - 32, 8}, false}, //top
-                {{16, height - 8, width - 32, 24}, false} //bottom
+                {{24, 32, 8, height - 48}, false}, //left
+                {{width - 32, 32, 8, height - 48}, false}, //right
+                {{40, 24, width - 80, 8}, false}, //top
+                {{40, height, width - 80, 24}, false} //bottom
             };
 
             damageColliders = {
@@ -60,7 +60,8 @@ class player_entity : public box_entity {
 
             mass = 3.0;
             //applyFriction = false;
-            animators.at(0).name = "Anastasia-Stand";
+            animators.at(0).setScaling(4.0, 4.0);
+            animators.at(0).name = "tick-stand";
             wrld::sound_mgr.load("walk");
             wrld::sound_mgr.load("death");
             wrld::sound_mgr.load("jump");
@@ -90,32 +91,32 @@ class player_entity : public box_entity {
 
             animators.at(0).flipSprite = facingLeft;
             if (!bottomCollider) {
-                if (animators.at(0).name == "Anastasia-Stand" || animators.at(0).name == "Anastasia-Run") {
+                if (animators.at(0).name == "tick-stand" || animators.at(0).name == "tick-run") {
                     wrld::sound_mgr.play("jump");
                 }
-                animators.at(0).name = "Anastasia-Fall";
+                animators.at(0).name = "tick-fall";
                 animators.at(0).animated = false;
                 animators.at(0).frame = 0;
                 hasChanged = true;
             }
             else if (!running) {
-                if (animators.at(0).name == "Anastasia-Fall") {
+                if (animators.at(0).name == "tick-fall") {
                     wrld::sound_mgr.play("jump");
                 }
-                animators.at(0).name = "Anastasia-Stand";
+                animators.at(0).name = "tick-stand";
                 animators.at(0).animated = false;
                 animators.at(0).frame = 0;
                 hasChanged = true;
             }
             else {
-                if (animators.at(0).name == "Anastasia-Fall") {
+                if (animators.at(0).name == "tick-fall") {
                     wrld::sound_mgr.play("jump");
                 }
                 stepSoundCounter -= delta_time;
                 if (hasChanged && (animators.at(0).frame == 0 || animators.at(0).frame == 3)) {
                     wrld::sound_mgr.play("walk");
                 }
-                animators.at(0).name = "Anastasia-Run";
+                animators.at(0).name = "tick-run";
                 animators.at(0).animated = true;
                 hasChanged = true;
             }

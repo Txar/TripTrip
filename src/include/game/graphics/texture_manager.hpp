@@ -15,7 +15,7 @@ class texture_manager {
         sf::Sprite get_sprite(std::string texture_name, int frame = -1, int width = -1, int height = -1, bool flipped = false, int variant = 0) {
             sf::Sprite s;
             if (frame != -1) {
-                s.setTextureRect(sf::IntRect({frame * width, width * variant}, {width, height}));
+                s.setTextureRect(sf::IntRect({frame * width, height * variant}, {width, height}));
             }
             if (is_loaded(texture_name)) {
                 s.setTexture(textures[texture_name]);

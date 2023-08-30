@@ -17,6 +17,8 @@ namespace wrld {
 
     bool player_is_alive = false;
 
+    sf::Font font;
+
     int death_counter = 0;
 
     sf::Vector2f camera_center;
@@ -25,6 +27,8 @@ namespace wrld {
     const float FRICTION_COEFFICIENT_NORMAL = 0.1;
 
     const float FORCE_MULTIPLIER = wrld::BLOCK_SIZE * 16;
+
+    bool paused = false;
 }
 
 class entity {

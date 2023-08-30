@@ -17,6 +17,7 @@ class animator {
         float progress = 0.0;
         bool reverse = false;
         bool flipSprite = false;
+        int variant = 0;
 
         sf::Vector2f scaling = {1.0, 1.0};
 
@@ -69,9 +70,11 @@ class animator {
 
         sf::Sprite getSprite() {
             sf::Sprite s;
-            if (animated) s = texture_mgr.get_sprite(name, frame, width, height, flipSprite);
+            if (animated) s = texture_mgr.get_sprite(name, frame, width, height, flipSprite, variant);
             else s = texture_mgr.get_sprite(name, flipSprite);
             s.setScale(scaling);
+            width = s.getTextureRect().width;
+            height = s.getTextureRect().height;
             return s;
         }
 };
