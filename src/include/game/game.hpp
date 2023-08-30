@@ -34,28 +34,30 @@ class game {
             float second_timer = 0;
 
             w.summonPlayer();
-            entity *player = w.alive_entity_mgr.get_ptr("player0");
-            player->x = w.block_mgr.player_spawn.x;
-            player->y = w.block_mgr.player_spawn.y;
+            //entity *player = w.alive_entity_mgr.get_ptr("player0");
 
             kb::new_bind(sf::Keyboard::A, "move_left");
             kb::new_bind(sf::Keyboard::D, "move_right");
             kb::new_bind(sf::Keyboard::Space, "jump");
 
+            
+
             clock.restart();
             while (running) {
                 delta_time = clock.restart().asSeconds();
+                if (delta_time > 1.0/20.0) {
+                    delta_time = 1.0/20.0;
+                }
                 second_timer += delta_time;
                 if (second_timer >= 1) {
                     second_timer = 0;
                     fps = frame;
                     wrld::fps = fps;
-                    std::cout << fps << " fps" << std::endl;
                     frame = 0;
                 }
                 frame++;
 
-                bool draw_colliders = true;
+                bool draw_colliders = false;
 
                 //if (!srvr::eventPool.isEmpty()) {
                 //    for (srvr::event i;; srvr::eventPool.iter(&i)) {
@@ -66,12 +68,14 @@ class game {
 
 
                 screen_mgr.clear();
-                screen_mgr.draw_background();
-                screen_mgr.draw_blocks(w.block_mgr.tilemap); //needs optimization obviously
+                screen_mgr.drawBackground();
+                screen_mgr.drawBlocks(w.block_mgr.tilemap); //needs optimization obviously
                 screen_mgr.drawEntities(&w.alive_entity_mgr.entities, draw_colliders);
+                screen_mgr.drawConsole();
                 w.resetCamera(screen_mgr.screen_width, screen_mgr.screen_height);
                 screen_mgr.moveCamera();
 
+                wrld::sound_mgr.play_sounds();
                 em::updateGlobalEvents();
 
                 w.actOnEvents();

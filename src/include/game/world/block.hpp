@@ -3,17 +3,11 @@
 #include "SFML/Graphics.hpp"
 #include "game/graphics/animator.hpp"
 #include "game/io/debug.hpp"
-
-namespace wrld {
-    const int BLOCK_SIZE = 64;
-
-    int WORLD_WIDTH = 128;
-    int WORLD_HEIGHT = 128;
-}
+#include "game/world/entity.hpp"
 
 class block {
     public:
-        bool visible = true, solid = true;
+        bool visible = true, solid = true, kills = false, animated_collider = false;
         std::string name;
         animator anim;
 
@@ -23,17 +17,26 @@ class block {
                 visible = false;
                 solid = false;
             }
+            anim.setScaling(wrld::SCALING, wrld::SCALING);
 
             collider = sf::IntRect(0, 0, wrld::BLOCK_SIZE, wrld::BLOCK_SIZE);
         }
 
         void update(float delta_time) {
             if (visible) anim.update(delta_time);
+            if (animated_collider) {
+                if ((int)animatedColliders.size() > anim.frame) {
+                    collider = animatedColliders.at(anim.frame);
+                } else {
+                    print("Animated block (" + name + ") lacks colliders!");
+                }
+            }
         }
 
         sf::Sprite draw() {
             return anim.getSprite();
         }
 
+        std::vector<sf::IntRect> animatedColliders;
         sf::IntRect collider;
 };

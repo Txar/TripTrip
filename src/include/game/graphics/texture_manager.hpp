@@ -37,7 +37,7 @@ class texture_manager {
         bool load(std::string texture_name) {
             sf::Texture t;
             bool success = true;
-            if (texture_name == "none") t.loadFromFile(textures_path + "/none.png");
+            if (texture_name == "none") t.loadFromFile(textures_path + "/" + missing_texture_name + ".png");
             else {
                 success = t.loadFromFile(textures_path + "/" + texture_name + ".png");
                 if (!success) {

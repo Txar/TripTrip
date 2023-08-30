@@ -2,15 +2,22 @@
 
 #include "SFML/Graphics.hpp"
 #include "game/graphics/animator.hpp"
-#include "block.hpp"
 #include "game/io/debug.hpp"
 
 namespace wrld {
+    const int BLOCK_SIZE = 64;
+    const int SCALING = 4.0;
+
+    int WORLD_WIDTH = 128;
+    int WORLD_HEIGHT = 128;
+
     float camera_x = 0;
     float camera_y = 0;
     int fps;
 
     bool player_is_alive = false;
+
+    int death_counter = 0;
 
     sf::Vector2f camera_center;
 

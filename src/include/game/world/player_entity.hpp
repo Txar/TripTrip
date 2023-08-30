@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/content/sound_engine.hpp"
 #include "box_entity.hpp"
 #include "game/io/events.hpp"
 #include "game/math/cap.hpp"
@@ -13,16 +14,18 @@ class player_entity : public box_entity {
 
     public:
         virtual void actOnEvents() {
-            srvr::event e;
-            pressingRight = false, pressingLeft = false, pressingJump = false;
-            while (srvr::eventPool.iter(&e)) {
-                if (e.player != name) {
-                    //std::cout << e.player << " " << name << "\n";
-                    continue;
-                } 
-                if (e.type == "jump") pressingJump = true;
-                if (e.type == "move_left") pressingLeft = true;
-                if (e.type == "move_right") pressingRight = true;
+            if (alive) {
+                srvr::event e;
+                pressingRight = false, pressingLeft = false, pressingJump = false;
+                while (srvr::eventPool.iter(&e)) {
+                    if (e.player != name) {
+                        //std::cout << e.player << " " << name << "\n";
+                        continue;
+                    } 
+                    if (e.type == "jump") pressingJump = true;
+                    if (e.type == "move_left") pressingLeft = true;
+                    if (e.type == "move_right") pressingRight = true;
+                }
             }
         }
         
@@ -35,8 +38,11 @@ class player_entity : public box_entity {
         float maxRunningVelocity = 1.0;
         float runningAcceleration = 1.0;
 
-        player_entity(entity &e) : box_entity{e} {
+        float stepSoundDelay = 0.5;
+        float stepSoundCounter = stepSoundDelay;
 
+        player_entity(entity &e) : box_entity{e} {
+            alive = true;
         }
 
         player_entity(std::string name, int _width, int _height, std::string _type = "playerEntity") : box_entity {name, _width, _height, _type} {
@@ -47,9 +53,25 @@ class player_entity : public box_entity {
                 {{16, 0, width - 32, 8}, false}, //top
                 {{16, height - 8, width - 32, 24}, false} //bottom
             };
+
+            damageColliders = {
+                {{32, 32, width - 64, height - 64}, false}
+            };
+
             mass = 3.0;
             //applyFriction = false;
+            animators.at(0).name = "Anastasia-Stand";
+            wrld::sound_mgr.load("walk");
+            wrld::sound_mgr.load("death");
+            wrld::sound_mgr.load("jump");
         };
+
+        void kill() {
+            alive = false;
+            wrld::death_counter++;
+            wrld::sound_mgr.play("death");
+            wrld::player_is_alive = false;
+        }
 
         virtual void update(float delta_time) {
             box_entity::update(delta_time);
@@ -68,18 +90,31 @@ class player_entity : public box_entity {
 
             animators.at(0).flipSprite = facingLeft;
             if (!bottomCollider) {
+                if (animators.at(0).name == "Anastasia-Stand" || animators.at(0).name == "Anastasia-Run") {
+                    wrld::sound_mgr.play("jump");
+                }
                 animators.at(0).name = "Anastasia-Fall";
                 animators.at(0).animated = false;
                 animators.at(0).frame = 0;
                 hasChanged = true;
             }
             else if (!running) {
+                if (animators.at(0).name == "Anastasia-Fall") {
+                    wrld::sound_mgr.play("jump");
+                }
                 animators.at(0).name = "Anastasia-Stand";
                 animators.at(0).animated = false;
                 animators.at(0).frame = 0;
                 hasChanged = true;
             }
             else {
+                if (animators.at(0).name == "Anastasia-Fall") {
+                    wrld::sound_mgr.play("jump");
+                }
+                stepSoundCounter -= delta_time;
+                if (hasChanged && (animators.at(0).frame == 0 || animators.at(0).frame == 3)) {
+                    wrld::sound_mgr.play("walk");
+                }
                 animators.at(0).name = "Anastasia-Run";
                 animators.at(0).animated = true;
                 hasChanged = true;
@@ -107,6 +142,10 @@ class player_entity : public box_entity {
             if (bottomCollider && jumpLoad < 1.0 && !holdingJump) {
                 justJumped = false;
                 jumpLoad = 1.0;
+            }
+
+            if (damageColliders.at(0).second) {
+                kill();
             }
 
             applyMovement(delta_time);

@@ -77,14 +77,25 @@ class entity_manager {
             else return &none;
         }
 
+        entity *get_ptr(int index) {
+            std::string name = entities.at(index)->name;
+            return get_ptr(name);
+        }
+
+        void remove(int index) {
+            std::string name = entities.at(index)->name;
+            entities.erase(entities.begin() + index);
+            std::string t = type(name);
+            if (t == "baseEntity") base_entities.erase(name);
+            if (t == "boxEntity") box_entities.erase(name);
+            if (t == "playerEntity") player_entities.erase(name);
+        }
+
         entity_manager(bool load = false) {
             if (load) {
                 player_entity p = player_entity("player", 128, 128);
                 add_entity(&p);
-                box_entity e = box_entity("box", 128, 128);
-                e.animators.push_back(animator("Anastasia-run", 128, 128, 6, 12.0));
-                e.applyGravity = true;
-                e.doApplyMovement = true;
+                entity e = box_entity("spawn", 128, 128);
                 add_entity(&e);
             }
         }

@@ -1,7 +1,8 @@
+#pragma once
+
 #include "SFML/Graphics.hpp"
 #include "texture_manager.hpp"
-
-#pragma once
+#include "game/io/debug.hpp"
 
 class animator {
     public:
@@ -40,7 +41,7 @@ class animator {
 
         bool update(float delta_time) {
             if (animated) {
-                progress += delta_time * speed;
+                progress = progress + (delta_time * speed);
                 if (progress >= 1.0) {
                     progress = progress - 1.0;
                     if (frame == frames - 1) {

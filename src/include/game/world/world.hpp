@@ -28,12 +28,12 @@ class world {
             wrld::BLOCK_SIZE, wrld::BLOCK_SIZE);
         }
 
-        std::vector<sf::IntRect> surroundingBlockColliders(int x, int y, int radius = 3) {
+        std::vector<std::pair<sf::IntRect, block*>> surroundingBlockColliders(int x, int y, int radius = 3) {
             return surroundingBlocksColiidersTile(int(customRound(x) / wrld::BLOCK_SIZE), int(customRound(y) / wrld::BLOCK_SIZE), radius);
         }
 
-        std::vector<sf::IntRect> surroundingBlocksColiidersTile(int x, int y, int radius = 3) {
-            std::vector<sf::IntRect> colliders;
+        std::vector<std::pair<sf::IntRect, block*>> surroundingBlocksColiidersTile(int x, int y, int radius = 3) {
+            std::vector<std::pair<sf::IntRect, block*>> colliders;
             for (int i = x - radius; i < x + radius; i++) {
                 if (!isInBoundsTile(i, 0)) continue;
                 for (int j = y - radius; j < y + radius; j++) {
@@ -42,7 +42,7 @@ class world {
                         sf::IntRect c = block_mgr.tilemap[i][j]->collider;
                         c.left += i * wrld::BLOCK_SIZE;
                         c.top += j * wrld::BLOCK_SIZE;
-                        colliders.push_back(c);
+                        colliders.push_back({c, block_mgr.tilemap[i][j]});
                     }
                 }
             }
@@ -50,14 +50,28 @@ class world {
         }
 
         void checkEntityColliders(entity *e) {
-            std::vector<sf::IntRect> colliders = surroundingBlockColliders(e->x, e->y);
+            std::vector<std::pair<sf::IntRect, block*>> colliders = surroundingBlockColliders(e->x, e->y);
             for (int i = 0; i < int(e->colliders.size()); i++) {
                 sf::IntRect c = e->colliders.at(i).first;
                 c.left += e->x;
                 c.top += e->y;
                 e->colliders.at(i).second = false;
-                for (sf::IntRect j : colliders) {
-                    if (c.intersects(j)) {
+
+                bool killed = false;
+
+                for (auto j : colliders) {
+                    if (!killed && j.second->kills) {
+                        for (int i = 0; i < int(e->damageColliders.size()); i++) {
+                            sf::IntRect c = e->damageColliders.at(i).first;
+                            c.left += e->x;
+                            c.top += e->y;
+                            if (c.intersects(j.first)) {
+                                e->damageColliders.at(i).second = true;
+                                killed = true;
+                            }
+                        }
+
+                    } else if (c.intersects(j.first)) {
                         e->colliders.at(i).second = true;
                         break;
                     }
@@ -66,21 +80,37 @@ class world {
         }
 
         world() : block_mgr(true) {
+            entity *spawn = alive_entity_mgr.get_ptr("spawn");
+            spawn->x = block_mgr.player_spawn.x;
+            spawn->y = block_mgr.player_spawn.y;
+
             //summonPlayer();
         }
 
         void summonPlayer() {
+            wrld::player_is_alive = true;
             em::player_name = alive_entity_mgr.available_name("player");
             alive_entity_mgr.add_entity(wrld::entity_mgr.get_ptr("player"), em::player_name);
             entity *p = alive_entity_mgr.get_ptr(em::player_name);
             p->name = em::player_name;
+            p->x = block_mgr.player_spawn.x;
+            p->y = block_mgr.player_spawn.y;
+            p->alive = true;
         }
 
         void update(float delta_time, int fps = -1) {
             if (fps == -1) fps = 1/delta_time;
             
             entity *e;
+            
+            std::vector<int> entities_to_kill;
+
             while (alive_entity_mgr.iter(&e)) {
+                if (!e->alive) {
+                    entities_to_kill.push_back(alive_entity_mgr.iterator - 1);
+                    continue;
+                }
+
                 if (fps < 60) {
                     checkEntityColliders(e);
                     e->update(delta_time / 3);
@@ -102,8 +132,17 @@ class world {
                 e->after();
             }
 
+            for (int i = 0; i < (int) entities_to_kill.size(); i++) {
+                int index = entities_to_kill.at(i) - i;
+                alive_entity_mgr.remove(index);
+            }
+
+            if (!wrld::player_is_alive) {
+                summonPlayer();
+            }
+
             block_mgr.update(delta_time);
-        }
+        }   
 
         void actOnEvents() {
             entity *e;

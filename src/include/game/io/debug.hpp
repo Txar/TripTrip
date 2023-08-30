@@ -28,3 +28,7 @@ void print(std::string line) {
 void print(int number) {
     de.line(std::to_string(number));
 }
+
+void print(float number) {
+    de.line(std::to_string(number));
+}

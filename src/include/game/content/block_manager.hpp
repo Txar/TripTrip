@@ -1,5 +1,6 @@
 #pragma once
 #include "game/world/animated_block.hpp"
+#include "game/world/background_block.hpp"
 #include <fstream>
 
 class block_manager {
@@ -43,20 +44,38 @@ class block_manager {
                 block _none("none");
 
                 block tile("tile");
-                tile.anim.setScaling(4.0, 4.0);
 
-                block wall("wall");
-                wall.anim.setScaling(4.0, 4.0);
-                wall.solid = false;
+                block _block("block");
 
-                block spawn("spawn");
+                background_block spawn("spawn");
                 spawn.visible = false;
-                spawn.solid = false;
+
+                block spike("spike");
+                spike.kills = true;
+
+                animated_block fire("fire", 14, 6.0);
+                fire.kills = true;
+
+                background_block trash_can("trash_can");
+                background_block wall("wall");
+                background_block graffiti1("love_is_love");
+                background_block graffiti2("pacifism");
+                background_block graffiti3("eat_the_rich");
+                background_block graffiti4("cat");
+
+                add_block(&graffiti1);
+                add_block(&graffiti2);
+                add_block(&graffiti3);
+                add_block(&graffiti4);
 
                 add_block(&spawn);
                 add_block(&_none);
                 add_block(&tile);
                 add_block(&wall);
+                add_block(&spike);
+                add_block(&trash_can);
+                add_block(&_block);
+                add_block(&fire);
 
                 load_level("0");
             }
@@ -126,7 +145,6 @@ class block_manager {
                 } else if (status != "none") {
                     if (status == "layout") {
                         int *b = decompress_blocks(buffer);
-                        std::cout << buffer << " ";
                         for (int i = 0; i < b[0]; i++) {
                             layout.push_back(b[1]);
                         }
@@ -140,13 +158,10 @@ class block_manager {
             wrld::WORLD_WIDTH = std::stoi(properties.at("width"));
             wrld::WORLD_HEIGHT = std::stoi(properties.at("height"));
 
-            std::cout << layout.size() << "\n";
-
             int count = 0;
             for (int i = 0; i < wrld::WORLD_WIDTH; i++) {
 
                 tilemap[i] = new block *[wrld::WORLD_HEIGHT];
-                std::cout << "\n";
                 for (int j = 0; j < wrld::WORLD_HEIGHT; j++) {
                     block *b = get_ptr(palette.at(std::to_string(layout.at((j * wrld::WORLD_WIDTH) + i))));
 

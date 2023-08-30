@@ -12,7 +12,9 @@ class screen_manager {
         sf::Font font;
         sf::View camera;
         //sf::Color background_color = {119, 157, 206};
-        sf::Color background_color = {60, 60, 60};
+        sf::Color background_color = {90, 90, 90};
+        sf::Color background_filter = {60, 60, 60, 160};
+
         std::vector<sf::Sprite> background_sprites;
 
         const float BACKGROUND_SCALING = 16.0;
@@ -28,9 +30,9 @@ class screen_manager {
             camera.setSize({float(screen_width), float(screen_height)});
             window.setFramerateLimit(60);
 
-            texture_mgr.onload_scaling = BACKGROUND_SCALING;
+            //texture_mgr.onload_scaling = BACKGROUND_SCALING;
             background_sprites = {texture_mgr.get_sprite("background_0"), texture_mgr.get_sprite("background_1"), texture_mgr.get_sprite("background_2")};
-            texture_mgr.onload_scaling = 1.0;
+            //texture_mgr.onload_scaling = 1.0;
 
             if (!font.loadFromFile("assets/Roboto-Regular.ttf")){
                 std::cout << "Font missing!" << std::endl;
@@ -71,7 +73,7 @@ class screen_manager {
             window.draw(s);
         }
 
-        void draw_blocks(block ***blocks) {
+        void drawBlocks(block ***blocks) {
             sf::RenderTexture blocks_buffer;
             blocks_buffer.create(screen_width, screen_height);
             blocks_buffer.clear(sf::Color(0, 0, 0, 0));
@@ -91,17 +93,21 @@ class screen_manager {
             window.draw(s);
         }
 
-        void draw_background() {
+        void drawBackground() {
+            sf::Vector2f c = camera.getCenter();
             for (int i = 0; i < (int) background_sprites.size(); i++) {
-                sf::Sprite *s = &background_sprites.at(i);
-                sf::Vector2f c = camera.getCenter();
                 sf::FloatRect r = {c.x - screen_width/2, wrld::BLOCK_SIZE * wrld::WORLD_HEIGHT - BACKGROUND_SCALING * 128, (float) screen_width + wrld::BLOCK_SIZE * 2, (float) screen_height};
-                s->setScale(1.0, 1.0);
+                sf::Sprite *s = &background_sprites.at(i);
+                s->setScale(BACKGROUND_SCALING, BACKGROUND_SCALING);
                 r.left = r.left - r.left * sqrt(sqrt(sqrt((i * i) + 1))) - wrld::BLOCK_SIZE;
                 s->setPosition((float)r.left, (float)r.top);
                 //s->setTextureRect(sf::IntRect(r));
                 window.draw(*s);
             }
+            sf::RectangleShape filter({(float) screen_width + wrld::BLOCK_SIZE * 2, (float) screen_height});
+            filter.setPosition(c.x - screen_width/2, c.y - screen_height/2);
+            filter.setFillColor(background_filter);
+            window.draw(filter);
         }
 
         void clear() {
@@ -110,6 +116,14 @@ class screen_manager {
 
         void moveCamera() {
             camera.setCenter({float(wrld::camera_x), float(wrld::camera_y)});
+        }
+
+        void drawConsole() {
+            sf::Text text(std::to_string(wrld::fps) + " FPS\n" + de.console, font, 16);
+
+            text.setFillColor(sf::Color(255, 0, 0));
+            text.setPosition(sf::Vector2f(camera.getCenter().x - screen_width / 2, camera.getCenter().y - screen_height / 2));
+            window.draw(text);
         }
 
         bool update() {
@@ -121,12 +135,6 @@ class screen_manager {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6)) window.setFramerateLimit(55);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num7)) window.setFramerateLimit(0);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) return false;
-
-            sf::Text text(std::to_string(wrld::fps) + " FPS\n" + de.console, font, 16);
-
-            text.setFillColor(sf::Color(255, 0, 0));
-            text.setPosition(sf::Vector2f(wrld::camera_x - screen_width / 2, wrld::camera_y - screen_height / 2));
-            window.draw(text);
 
             //camera.reset({float(wrld::camera_x + 64 - screen_width/2), float(wrld::camera_y + 64 - screen_height/2), float(screen_width), float(screen_height)}); // wrld::camera_center, {float(screen_width), float(screen_height)}
             
