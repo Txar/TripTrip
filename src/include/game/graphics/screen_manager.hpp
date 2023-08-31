@@ -47,6 +47,11 @@ class screen_manager {
             if (!wrld::font.loadFromFile("assets/joystix_monospace.otf")){
                 std::cout << "Font missing!" << std::endl;
             }
+
+            sf::Image im = sf::Image();
+            if (im.loadFromFile("assets/fire_icon.png")) {
+                window.setIcon(im.getSize().x, im.getSize().y, im.getPixelsPtr());
+            }
         }
 
         ~screen_manager() {
@@ -200,7 +205,9 @@ class screen_manager {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) window.setFramerateLimit(50);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6)) window.setFramerateLimit(55);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num7)) window.setFramerateLimit(0);
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) return false;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+                wrld::paused = !wrld::paused;
+            }
 
             //camera.reset({float(wrld::camera_x + 64 - screen_width/2), float(wrld::camera_y + 64 - screen_height/2), float(screen_width), float(screen_height)}); // wrld::camera_center, {float(screen_width), float(screen_height)}
             

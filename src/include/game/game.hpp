@@ -31,8 +31,6 @@ class game {
         int main_loop() {
             bool running = true;
 
-            
-
             sf::Clock clock;
             float second_timer = 0;
 
@@ -80,11 +78,14 @@ class game {
                 wrld::sound_mgr.play_sounds();
                 em::updateGlobalEvents();
 
-                ui_mgr.update();
                 if (!wrld::paused) {
                     w.actOnEvents();
                     w.update(delta_time, fps);
+                    ui_mgr.scene = "game";
+                } else {
+                    ui_mgr.scene = "paused";
                 }
+                ui_mgr.update();
 
                 running = screen_mgr.update();
             }

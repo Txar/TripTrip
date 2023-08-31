@@ -42,6 +42,14 @@ class ui {
                 text_button pause_title("pause_title", al::CENTER, al::MIDDLE, 0, - (2 * wrld::BLOCK_SIZE));
                 pause_title.scene = "paused";
                 buttons.push_back(pause_title);
+
+                button close("x", al::CENTER, al::BOTTOM, 0, - (2 * wrld::BLOCK_SIZE));
+                close.scene = "message";
+                buttons.push_back(close);
+
+                text_button message("paper_0", al::CENTER, al::MIDDLE, 0, 0);
+                message.scene = "message";
+                buttons.push_back(message);
             }
         }
 

@@ -7,7 +7,7 @@
 
 class block {
     public:
-        bool visible = true, solid = true, kills = false, animated_collider = false, draw_shadow = false, is_background = false;
+        bool visible = true, solid = true, kills = false, animated_collider = false, draw_shadow = false, is_background = false, is_finish = false;
         std::string name;
         animator anim;
 

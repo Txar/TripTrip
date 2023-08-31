@@ -29,16 +29,18 @@ class sound_engine {
 
         void updateVolume() {
             music.setVolume(100.0 * sound_volume * wrld::music_on);
-
+            play_music();
         }
 
-        bool loadMusic(std::string name, std::string file_format = "ogg") {
-            return music.openFromFile(sounds_path + name + "." + file_format);
+        void loadMusic(std::string name, std::string file_format = "ogg") {
+            queue.push_back(name + "." + file_format);
         }
 
         void play_music() {
-            if (music.getStatus() == sf::Music::Stopped) {
-                music.play();
+            if ((int)queue.size() > 0 && music.getStatus() == sf::Music::Stopped) {
+                if (music.openFromFile(sounds_path + queue.at(0))) music.play();
+                else std::cout << "oh NO\n";
+                queue.erase(queue.begin());
             }
         }
 

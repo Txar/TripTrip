@@ -17,6 +17,8 @@ namespace wrld {
 
     bool player_is_alive = false;
 
+    int level = 0;
+
     sf::Font font;
 
     int death_counter = 0;

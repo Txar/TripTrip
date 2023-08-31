@@ -10,6 +10,8 @@ class world {
         block_manager block_mgr;
 
     public:
+        bool load_world = false;
+
         bool isInBounds(int x, int y) {
             return isInBounds(int(customRound(x) / wrld::BLOCK_SIZE), int(customRound(y) / wrld::BLOCK_SIZE));
         }
@@ -38,7 +40,7 @@ class world {
                 if (!isInBoundsTile(i, 0)) continue;
                 for (int j = y - radius; j < y + radius; j++) {
                     if (!isInBoundsTile(0, j)) continue;
-                    if (block_mgr.is_solid(i, j)) {
+                    if (block_mgr.is_solid(i, j) || block_mgr.tilemap[i][j]->is_finish || block_mgr.tilemap[i][j]->kills) {
                         sf::IntRect c = block_mgr.tilemap[i][j]->collider;
                         c.left += i * wrld::BLOCK_SIZE;
                         c.top += j * wrld::BLOCK_SIZE;
@@ -73,6 +75,9 @@ class world {
 
                     } else if (c.intersects(j.first)) {
                         e->colliders.at(i).second = true;
+                        if (j.second->is_finish) {
+                            load_world = true;
+                        }
                         break;
                     }
                 }
@@ -141,6 +146,16 @@ class world {
                 summonPlayer();
             }
 
+            if (load_world) {
+                block_mgr.load_level(block_mgr.level_to_load);
+                alive_entity_mgr = entity_manager();
+                entity *spawn = alive_entity_mgr.get_ptr("spawn");
+                spawn->x = block_mgr.player_spawn.x;
+                spawn->y = block_mgr.player_spawn.y;
+                wrld::player_is_alive = false;
+                load_world = false;
+                wrld::level++;
+            }
             block_mgr.update(delta_time);
         }   
 

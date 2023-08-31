@@ -9,6 +9,8 @@ class block_manager {
         block ***tilemap;
         block none;
 
+        std::string level_to_load = "0";
+
         const std::string level_directory = "assets/levels/";
         const std::string level_extension = ".ttl";
 
@@ -50,12 +52,19 @@ class block_manager {
                 background_block spawn("spawn");
                 spawn.visible = false;
 
+                background_block finish("finish");
+                finish.visible = false;
+                finish.is_finish = true;
+                add_block(&finish);
+
                 block spike("spike");
                 spike.kills = true;
+                spike.collider = sf::IntRect(16, 24, 32, 40);
 
                 block spike_wall("spike_wall");
                 spike_wall.kills = true;
                 spike_wall.is_background = true;
+                spike_wall.collider = sf::IntRect(16, 24, 32, 40);
                 add_block(&spike_wall);
 
                 animated_block fire("fire", 14, 6.0);
@@ -108,6 +117,14 @@ class block_manager {
                 background_block support_right("support_right");
                 add_block(&support_right);
 
+                block left_half("left_half");
+                left_half.collider = sf::IntRect(0, 0, (int) wrld::BLOCK_SIZE / 2.0, wrld::BLOCK_SIZE);
+                add_block(&left_half);
+
+                block right_half("right_half");
+                right_half.collider = sf::IntRect((int) wrld::BLOCK_SIZE / 2, 0, (int) wrld::BLOCK_SIZE / 2, wrld::BLOCK_SIZE);
+                add_block(&right_half);
+
                 block easter_egg("none");
                 add_block(&easter_egg);
 
@@ -142,7 +159,7 @@ class block_manager {
 
         void update(float delta_time) {
             for (auto i : blocks) {
-                blocks[i.first].update(delta_time);
+                blocks.at(i.first).update(delta_time);
             }
         }
 
@@ -213,7 +230,8 @@ class block_manager {
             wrld::WORLD_WIDTH = std::stoi(properties.at("width"));
             wrld::WORLD_HEIGHT = std::stoi(properties.at("height"));
             wrld::sound_mgr.loadMusic(properties.at("music"));
-            wrld::sound_mgr.play_music();
+
+            level_to_load = properties.at("next");
 
             int count = 0;
             for (int i = 0; i < wrld::WORLD_WIDTH; i++) {
