@@ -99,6 +99,13 @@ class entity_manager {
                 add_entity(&e);
             }
         }
+
+        ~entity_manager() {
+            base_entities.clear();
+            box_entities.clear();
+            player_entities.clear();
+            entities.clear();
+        }
 };
 
 namespace wrld {

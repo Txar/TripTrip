@@ -61,6 +61,16 @@ class world {
 
                 bool killed = false;
 
+                for (int j = 0; j < (int) block_mgr.seeds.size(); j++) {
+                    sf::IntRect rect = {block_mgr.seeds.at(j).x * wrld::BLOCK_SIZE, block_mgr.seeds.at(j).y * wrld::BLOCK_SIZE, wrld::BLOCK_SIZE, wrld::BLOCK_SIZE};
+                    if (c.intersects(rect)) {
+                        block_mgr.seeds.erase(block_mgr.seeds.begin() + j);
+                        wrld::sound_mgr.play("seed");
+                        wrld::collected_seeds++;
+                        break;
+                    }
+                }
+
                 for (auto j : colliders) {
                     if (!killed && j.second->kills) {
                         for (int i = 0; i < int(e->damageColliders.size()); i++) {
@@ -86,6 +96,7 @@ class world {
 
         world() : block_mgr(true) {
             entity *spawn = alive_entity_mgr.get_ptr("spawn");
+            wrld::sound_mgr.load("seed");
             spawn->x = block_mgr.player_spawn.x;
             spawn->y = block_mgr.player_spawn.y;
 
@@ -110,6 +121,8 @@ class world {
             
             std::vector<int> entities_to_kill;
 
+            block_mgr.update(delta_time);
+
             while (alive_entity_mgr.iter(&e)) {
                 if (!e->alive) {
                     entities_to_kill.push_back(alive_entity_mgr.iterator - 1);
@@ -118,17 +131,21 @@ class world {
 
                 if (fps < 60) {
                     checkEntityColliders(e);
-                    e->update(delta_time / 3);
+                    e->update(delta_time / 4.0);
                     checkEntityColliders(e);
-                    e->update(delta_time / 3);
+                    e->update(delta_time / 4.0);
                     checkEntityColliders(e);
-                    e->update(delta_time / 3);
+                    e->update(delta_time / 4.0);
+                    checkEntityColliders(e);
+                    e->update(delta_time / 4.0);
                 }
                 else if (fps < 100) {
                     checkEntityColliders(e);
-                    e->update(delta_time / 2);
+                    e->update(delta_time / 3.0);
                     checkEntityColliders(e);
-                    e->update(delta_time / 2);
+                    e->update(delta_time / 3.0);
+                    checkEntityColliders(e);
+                    e->update(delta_time / 3.0);
                 }
                 else {
                     checkEntityColliders(e);
@@ -156,7 +173,6 @@ class world {
                 load_world = false;
                 wrld::level++;
             }
-            block_mgr.update(delta_time);
         }   
 
         void actOnEvents() {

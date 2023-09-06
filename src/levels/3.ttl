@@ -26,7 +26,7 @@ palette start
 palette end
 properties start
 next 0
-music love_hour
+music happy_ever_after
 width 80
 height 30
 properties end

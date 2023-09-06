@@ -69,6 +69,7 @@ class game {
                 screen_mgr.clear();
                 screen_mgr.drawBackground();
                 screen_mgr.drawBlocks(w.block_mgr.tilemap); //needs optimization obviously
+                screen_mgr.drawSeeds(w.block_mgr.seeds, delta_time);
                 screen_mgr.drawEntities(&w.alive_entity_mgr.entities, draw_colliders);
                 screen_mgr.drawUI(ui_mgr);
                 w.resetCamera(screen_mgr.screen_width, screen_mgr.screen_height);

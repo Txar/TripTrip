@@ -18,19 +18,29 @@ class screen_manager {
 
         sf::Color pause_color = {60, 60, 60, 160};
 
-        sf::Color tin ={0, 0, 0, 60};
+        sf::Color tin = {0, 0, 0, 60};
         //sf::Color tin = {0, 0, 0, 0};
+
+        animator seed_sprite;
 
         std::vector<sf::Sprite> background_sprites;
 
         const float BACKGROUND_SCALING = 16.0;
+
+        float seed_sway = 0.0;
+        float max_seed_sway = 8.0;
+        float seed_sway_speed = 16.0;
+        bool reverse_seed_sway = false;
 
     public:
         int screen_height, screen_width;
 
         sf::RenderWindow window;
 
-        screen_manager(std::string title, int _screen_width, int _screen_height) : window(sf::VideoMode(_screen_width, _screen_height), title) {
+        screen_manager(std::string title, int _screen_width, int _screen_height) : 
+        seed_sprite("seed"),
+        window(sf::VideoMode(_screen_width, _screen_height), title) {
+            seed_sprite.setScaling(4.0, 4.0);
             screen_width = _screen_width;
             screen_height = _screen_height;
             camera.setSize({float(screen_width), float(screen_height)});
@@ -151,6 +161,22 @@ class screen_manager {
             filter.setPosition(c.x - screen_width/2, c.y - screen_height/2);
             filter.setFillColor(background_filter);
             window.draw(filter);
+        }
+
+        void drawSeeds(std::vector<sf::Vector2i> &seeds, float delta_time) {
+            if (seed_sway <= 0.0 - max_seed_sway) {
+                reverse_seed_sway = false;
+            } else if (seed_sway >= max_seed_sway) {
+                reverse_seed_sway = true;
+            }
+
+            seed_sway += (reverse_seed_sway) ? - (seed_sway_speed * delta_time) : (seed_sway_speed * delta_time);
+
+            for (auto i : seeds) {
+                sf::Sprite s = seed_sprite.getSprite();
+                s.setPosition(i.x * wrld::BLOCK_SIZE, i.y * wrld::BLOCK_SIZE + seed_sway);
+                window.draw(s);
+            }
         }
 
         void clear() {

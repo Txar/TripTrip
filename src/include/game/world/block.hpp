@@ -29,6 +29,10 @@ class block {
             if (animated_collider) {
                 if ((int)animatedColliders.size() > anim.frame) {
                     collider = animatedColliders.at(anim.frame);
+                    collider.left *= wrld::SCALING;
+                    collider.width *= wrld::SCALING;
+                    collider.top *= wrld::SCALING;
+                    collider.height *= wrld::SCALING;
                 } else {
                     print("Animated block (" + name + ") lacks colliders!");
                 }

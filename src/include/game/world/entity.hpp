@@ -19,6 +19,9 @@ namespace wrld {
 
     int level = 0;
 
+    int collected_seeds = 0;
+    int all_seeds = 0;
+
     sf::Font font;
 
     int death_counter = 0;

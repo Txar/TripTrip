@@ -2,6 +2,7 @@
 #include "game/world/animated_block.hpp"
 #include "game/world/background_block.hpp"
 #include <fstream>
+#include <vector>
 
 class block_manager {
     public:
@@ -10,6 +11,8 @@ class block_manager {
         block none;
 
         std::string level_to_load = "0";
+
+        std::vector<sf::Vector2i> seeds;
 
         const std::string level_directory = "assets/levels/";
         const std::string level_extension = ".ttl";
@@ -57,6 +60,21 @@ class block_manager {
                 finish.is_finish = true;
                 add_block(&finish);
 
+                background_block street_light("street_light");
+                add_block(&street_light);
+
+                background_block pillar("pillar");
+                add_block(&pillar);
+
+                background_block tire_0("tire_0");
+                add_block(&tire_0);
+
+                background_block heart("heart");
+                add_block(&heart);
+
+                block asphalt("asphalt");
+                add_block(&asphalt);
+
                 block spike("spike");
                 spike.kills = true;
                 spike.collider = sf::IntRect(16, 24, 32, 40);
@@ -75,14 +93,14 @@ class block_manager {
                 moving_1_0.animated_collider = true;
                 moving_1_0.animatedColliders = {
                     sf::IntRect(0, 0, 16, 16),
-                    sf::IntRect(2, 0, 14, 16),
-                    sf::IntRect(4, 0, 12, 16),
-                    sf::IntRect(6, 0, 10, 16),
-                    sf::IntRect(8,  0, 8, 16),
-                    sf::IntRect(10, 0, 6, 16),
-                    sf::IntRect(12, 0, 4, 16),
-                    sf::IntRect(14, 0, 2, 16),
-                    sf::IntRect(16, 0, 0, 16)
+                    sf::IntRect(0, 0, 14, 16),
+                    sf::IntRect(0, 0, 12, 16),
+                    sf::IntRect(0, 0, 10, 16),
+                    sf::IntRect(0, 0, 8, 16),
+                    sf::IntRect(0, 0, 6, 16),
+                    sf::IntRect(0, 0, 4, 16),
+                    sf::IntRect(0, 0, 2, 16),
+                    sf::IntRect(0, 0, 0, 16)
                 };
                 add_block(&moving_1_0);
 
@@ -94,14 +112,14 @@ class block_manager {
                 moving_1_2.anim.name = "moving_1";
                 moving_1_2.animated_collider = true;
                 moving_1_2.animatedColliders = {
-                    sf::IntRect(16, 0, 0, 16),
-                    sf::IntRect(14, 0, 2, 16),
-                    sf::IntRect(12, 0, 4, 16),
-                    sf::IntRect(10, 0, 6, 16),
-                    sf::IntRect(8,  0, 8, 16),
-                    sf::IntRect(6, 0, 10, 16),
-                    sf::IntRect(4, 0, 12, 16),
-                    sf::IntRect(2, 0, 14, 16),
+                    sf::IntRect(0, 0, 0, 16),
+                    sf::IntRect(0, 0, 2, 16),
+                    sf::IntRect(0, 0, 4, 16),
+                    sf::IntRect(0, 0, 6, 16),
+                    sf::IntRect(0, 0, 8, 16),
+                    sf::IntRect(0, 0, 10, 16),
+                    sf::IntRect(0, 0, 12, 16),
+                    sf::IntRect(0, 0, 14, 16),
                     sf::IntRect(0, 0, 16, 16)
                 };
                 add_block(&moving_1_2);
@@ -186,7 +204,11 @@ class block_manager {
         }
 
         bool load_level(std::string level_name) {
-            tilemap = new block **[wrld::WORLD_WIDTH];
+            if (tilemap) {
+                delete [] tilemap;
+            }
+
+            seeds.clear();
 
             std::ifstream f;
             f.open(level_filename(level_name));
@@ -231,16 +253,23 @@ class block_manager {
             wrld::WORLD_HEIGHT = std::stoi(properties.at("height"));
             wrld::sound_mgr.loadMusic(properties.at("music"));
 
+            tilemap = new block **[wrld::WORLD_WIDTH];
+
             level_to_load = properties.at("next");
 
             int count = 0;
             for (int i = 0; i < wrld::WORLD_WIDTH; i++) {
                 tilemap[i] = new block *[wrld::WORLD_HEIGHT];
                 for (int j = 0; j < wrld::WORLD_HEIGHT; j++) {
-                    block *b = get_ptr(palette.at(std::to_string(layout.at((j * wrld::WORLD_WIDTH) + i))));
+                    std::string b_name = palette.at(std::to_string(layout.at((j * wrld::WORLD_WIDTH) + i)));
+                    block *b = get_ptr(b_name);
 
-                    if (b->name == "spawn") player_spawn = {i * wrld::BLOCK_SIZE, j * wrld::BLOCK_SIZE};
+                    if (b_name == "spawn") player_spawn = {i * wrld::BLOCK_SIZE, j * wrld::BLOCK_SIZE};
 
+                    if (b_name == "seed") {
+                        seeds.push_back({i, j});
+                        wrld::all_seeds++;
+                    }
                     tilemap[i][j] = b;
                     count++;
                 }

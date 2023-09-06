@@ -37,6 +37,11 @@ class player_entity : public box_entity {
         float jumpVelocity = 16.0;
         float maxRunningVelocity = 1.0;
         float runningAcceleration = 1.0;
+        
+        float coyote_time = 0.1;
+        float time_since_standing = 0.0;
+
+        float grace = false;
 
         float stepSoundDelay = 0.5;
         float stepSoundCounter = stepSoundDelay;
@@ -48,10 +53,10 @@ class player_entity : public box_entity {
         player_entity(std::string name, int _width, int _height, std::string _type = "playerEntity") : box_entity {name, _width, _height, _type} {
             animators.push_back(animator("none", 32, 32, 6));
             colliders = {
-                {{24, 32, 8, height - 48}, false}, //left
-                {{width - 32, 32, 8, height - 48}, false}, //right
-                {{40, 24, width - 80, 8}, false}, //top
-                {{40, height, width - 80, 24}, false} //bottom
+                {{24, 40, 8, height - 48}, false}, //left
+                {{width - 36, 40, 8, height - 48}, false}, //right
+                {{44, 24, width - 88, 8}, false}, //top
+                {{44, height, width - 88, 24}, false} //bottom
             };
 
             damageColliders = {
@@ -76,6 +81,11 @@ class player_entity : public box_entity {
 
         virtual void update(float delta_time) {
             box_entity::update(delta_time);
+            time_since_standing += delta_time;
+            grace = false;
+            if (!bottomCollider && time_since_standing <= coyote_time) {
+                grace = true;
+            } else if (bottomCollider) time_since_standing = 0;
 
             //std::cout << velocity.x << std::endl;
             if (abs(velocity.x) > 0.0) {
@@ -128,7 +138,7 @@ class player_entity : public box_entity {
                 if (pressingLeft) applyForce({-runningAcceleration, 0}, delta_time);
             }
 
-            if (pressingJump && !justJumped && bottomCollider) {
+            if (pressingJump && !justJumped && (bottomCollider || grace)) {
                 holdingJump = true;
                 justJumped = true;
             }
