@@ -30,7 +30,6 @@ palette start
 238609297 heart
 238609299 seed
 palette end
-palette end
 properties start
 next 1
 music track_1

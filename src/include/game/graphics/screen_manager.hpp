@@ -146,16 +146,18 @@ class screen_manager {
             window.draw(s);
         }
 
-        void drawBackground() {
+        void drawBackground(bool drawBackgrounds) {
             sf::Vector2f c = camera.getCenter();
-            for (int i = 0; i < (int) background_sprites.size(); i++) {
-                sf::FloatRect r = {c.x - screen_width/2, wrld::BLOCK_SIZE * wrld::WORLD_HEIGHT - BACKGROUND_SCALING * 128, (float) screen_width + wrld::BLOCK_SIZE * 2, (float) screen_height};
-                sf::Sprite *s = &background_sprites.at(i);
-                s->setScale(BACKGROUND_SCALING, BACKGROUND_SCALING);
-                r.left = r.left - r.left * sqrt(sqrt(sqrt((i * i) + 1))) - wrld::BLOCK_SIZE;
-                s->setPosition((float)r.left, (float)r.top);
-                //s->setTextureRect(sf::IntRect(r));
-                window.draw(*s);
+            if (drawBackgrounds) {
+                for (int i = 0; i < (int) background_sprites.size(); i++) {
+                    sf::FloatRect r = {c.x - screen_width/2, wrld::BLOCK_SIZE * wrld::WORLD_HEIGHT - BACKGROUND_SCALING * 128, (float) screen_width + wrld::BLOCK_SIZE * 2, (float) screen_height};
+                    sf::Sprite *s = &background_sprites.at(i);
+                    s->setScale(BACKGROUND_SCALING, BACKGROUND_SCALING);
+                    r.left = r.left - r.left * sqrt(sqrt(sqrt((i * i) + 1))) - wrld::BLOCK_SIZE;
+                    s->setPosition((float)r.left, (float)r.top);
+                    //s->setTextureRect(sf::IntRect(r));
+                    window.draw(*s);
+                }
             }
             sf::RectangleShape filter({(float) screen_width + wrld::BLOCK_SIZE * 2, (float) screen_height});
             filter.setPosition(c.x - screen_width/2, c.y - screen_height/2);
@@ -195,7 +197,7 @@ class screen_manager {
             window.draw(text);
         }
 
-        void drawUI(ui &ui_mgr, bool draw_console = true) {
+        void drawUI(ui &ui_mgr) {
             button t;
             button *b = &t;
 
@@ -214,13 +216,14 @@ class screen_manager {
             }
 
             while (ui_mgr.iter(b)) {
-                if (ui_mgr.scene != "none" && b->scene != "all" && b->scene != ui_mgr.scene) continue;
+                if ((ui_mgr.scene != "none" && b->scene != "all" && b->scene != ui_mgr.scene) || (b->level != wrld::level && b->level != -1)) continue;
+                if (b->action == "toggle_anastasia" && !texture_mgr.anastasia_unlocked) continue;
                 sf::Sprite s = b->anim.getSprite();
                 s.setPosition(b->x + cam.x, b->y + cam.y);
                 window.draw(s);
             }
 
-            if (draw_console) drawConsole();
+            if (wrld::draw_console) drawConsole();
         }
 
         bool update() {
@@ -231,9 +234,6 @@ class screen_manager {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) window.setFramerateLimit(50);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6)) window.setFramerateLimit(55);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num7)) window.setFramerateLimit(0);
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-                wrld::paused = !wrld::paused;
-            }
 
             //camera.reset({float(wrld::camera_x + 64 - screen_width/2), float(wrld::camera_y + 64 - screen_height/2), float(screen_width), float(screen_height)}); // wrld::camera_center, {float(screen_width), float(screen_height)}
             
@@ -248,8 +248,14 @@ class screen_manager {
                     screen_width = i.size.width;
                     screen_height = i.size.height;
                 }
-                if (i.type == sf::Event::EventType::Closed) {
+                else if (i.type == sf::Event::EventType::Closed) {
                     return false;
+                }
+                else if (i.type == sf::Event::EventType::KeyReleased && i.key.code == sf::Keyboard::Escape) {
+                    wrld::paused = !wrld::paused;
+                    if (wrld::ui_mgr->scene == "paused") {
+                        wrld::ui_mgr->scene = "game";
+                    }
                 }
             }
 

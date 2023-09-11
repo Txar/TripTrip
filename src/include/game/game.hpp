@@ -25,7 +25,9 @@ class game {
     
     public:
         game(bool _debug = false) : screen_mgr("TripTrip", 1280, 720), ui_mgr(true) {
+            wrld::ui_mgr = &ui_mgr;
             debug = _debug;
+            w.block_mgr.load_level("tutorial");
         }
         
         int main_loop() {
@@ -40,6 +42,10 @@ class game {
             kb::new_bind(sf::Keyboard::A, "move_left");
             kb::new_bind(sf::Keyboard::D, "move_right");
             kb::new_bind(sf::Keyboard::Space, "jump");
+            kb::new_bind(sf::Keyboard::Left, "move_left");
+            kb::new_bind(sf::Keyboard::Right, "move_right");
+            kb::new_bind(sf::Keyboard::W, "jump");
+            kb::new_bind(sf::Keyboard::Up, "jump");
 
             clock.restart();
             while (running) {
@@ -67,7 +73,7 @@ class game {
 
 
                 screen_mgr.clear();
-                screen_mgr.drawBackground();
+                screen_mgr.drawBackground(ui_mgr.drawBackgrounds);
                 screen_mgr.drawBlocks(w.block_mgr.tilemap); //needs optimization obviously
                 screen_mgr.drawSeeds(w.block_mgr.seeds, delta_time);
                 screen_mgr.drawEntities(&w.alive_entity_mgr.entities, draw_colliders);
@@ -82,7 +88,6 @@ class game {
                 if (!wrld::paused) {
                     w.actOnEvents();
                     w.update(delta_time, fps);
-                    ui_mgr.scene = "game";
                 } else {
                     ui_mgr.scene = "paused";
                 }

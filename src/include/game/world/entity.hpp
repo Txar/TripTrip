@@ -34,6 +34,10 @@ namespace wrld {
     const float FORCE_MULTIPLIER = wrld::BLOCK_SIZE * 16;
 
     bool paused = false;
+
+    int jump_counter = 0;
+
+    bool draw_console = false;
 }
 
 class entity {

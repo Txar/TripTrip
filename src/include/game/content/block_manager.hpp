@@ -10,6 +10,8 @@ class block_manager {
         block ***tilemap;
         block none;
 
+        sf::Clock clock;
+
         std::string level_to_load = "0";
 
         std::vector<sf::Vector2i> seeds;
@@ -152,11 +154,15 @@ class block_manager {
                 background_block graffiti2("pacifism");
                 background_block graffiti3("eat_the_rich");
                 background_block graffiti4("cat");
+                background_block graffiti5("fist");
+                background_block graffiti6("triptrip");
 
                 add_block(&graffiti1);
                 add_block(&graffiti2);
                 add_block(&graffiti3);
                 add_block(&graffiti4);
+                add_block(&graffiti5);
+                add_block(&graffiti6);
 
                 add_block(&spawn);
                 add_block(&_none);
@@ -166,8 +172,6 @@ class block_manager {
                 add_block(&trash_can);
                 add_block(&_block);
                 add_block(&fire);
-
-                load_level("0");
             }
         }
 
@@ -207,6 +211,8 @@ class block_manager {
             if (tilemap) {
                 delete [] tilemap;
             }
+
+            wrld::ui_mgr->scene = "message";
 
             seeds.clear();
 
@@ -251,7 +257,25 @@ class block_manager {
 
             wrld::WORLD_WIDTH = std::stoi(properties.at("width"));
             wrld::WORLD_HEIGHT = std::stoi(properties.at("height"));
-            wrld::sound_mgr.loadMusic(properties.at("music"));
+            if (properties.at("music") != "none") {
+                wrld::sound_mgr.loadMusic(properties.at("music"));
+            }
+
+            wrld::draw_console = false;
+            if (properties.find("last") != properties.end() && properties.at("last") == "true") {
+                float time = clock.getElapsedTime().asSeconds();
+                print("This is the end!\nThanks for playing! <3\nDeaths: "
+                + std::to_string(wrld::death_counter) + "\nSeeds collected: " 
+                + std::to_string(wrld::collected_seeds) + "/" + std::to_string(wrld::all_seeds) 
+                + "\nJumps: " + std::to_string(wrld::jump_counter) 
+                + "\nTotal time: " + std::to_string((int) floor(time / 60.0)) + " minutes " + std::to_string(int(floor(time)) % 60) + " seconds (" + std::to_string(time) + " seconds)");
+                wrld::draw_console = true;
+
+                if (wrld::all_seeds == wrld::collected_seeds) {
+                    texture_mgr.anastasia_unlocked = true;
+                    print("\nYou collected all the seeds! Congrats.\nAs a prize, you get a new special button at the bottom of the screen.");
+                }
+            }
 
             tilemap = new block **[wrld::WORLD_WIDTH];
 
@@ -274,6 +298,8 @@ class block_manager {
                     count++;
                 }
             }
+
+            if (wrld::level > 4) wrld::level = 1;
 
             return true;
         }

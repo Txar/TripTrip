@@ -2,6 +2,9 @@
 
 class texture_manager {
     public:
+        bool anastasia_unlocked = false;
+        bool anastasia_on = false;
+
         float onload_scaling = 1.0;
 
         texture_manager() {

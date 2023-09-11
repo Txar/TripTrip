@@ -27,6 +27,8 @@ class button {
         bool visible = true;
         bool freeze = false;
 
+        int level = -1;
+
         std::string scene = "all";
         std::string action = "none";
 

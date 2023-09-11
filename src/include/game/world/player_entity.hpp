@@ -46,6 +46,10 @@ class player_entity : public box_entity {
         float stepSoundDelay = 0.5;
         float stepSoundCounter = stepSoundDelay;
 
+        std::string run_name = "tick-run";
+        std::string stand_name = "tick-stand";
+        std::string fall_name = "tick-fall";
+
         player_entity(entity &e) : box_entity{e} {
             alive = true;
         }
@@ -60,13 +64,13 @@ class player_entity : public box_entity {
             };
 
             damageColliders = {
-                {{32, 32, width - 64, height - 64}, false}
+                {{40, 32, width - 80, height - 64}, false}
             };
 
             mass = 3.0;
             //applyFriction = false;
             animators.at(0).setScaling(4.0, 4.0);
-            animators.at(0).name = "tick-stand";
+            animators.at(0).name = stand_name;
             wrld::sound_mgr.load("walk");
             wrld::sound_mgr.load("death");
             wrld::sound_mgr.load("jump");
@@ -80,12 +84,31 @@ class player_entity : public box_entity {
         }
 
         virtual void update(float delta_time) {
+            if (texture_mgr.anastasia_unlocked) {
+                if (texture_mgr.anastasia_on) {
+                    animators.at(0).setScaling(1.0, 1.0);
+                    animators.at(0).width = 128;
+                    animators.at(0).height = 128;
+                    run_name = "Anastasia-Run";
+                    stand_name = "Anastasia-Stand";
+                    fall_name = "Anastasia-Fall";
+                } else {
+                    animators.at(0).setScaling(4.0, 4.0);
+                    animators.at(0).width = 32;
+                    animators.at(0).height = 32;
+                    run_name = "tick-run";
+                    stand_name = "tick-stand";
+                    fall_name = "tick-fall";
+                }
+            }
+
             box_entity::update(delta_time);
             time_since_standing += delta_time;
             grace = false;
             if (!bottomCollider && time_since_standing <= coyote_time) {
                 grace = true;
             } else if (bottomCollider) time_since_standing = 0;
+            //grace = true;
 
             //std::cout << velocity.x << std::endl;
             if (abs(velocity.x) > 0.0) {
@@ -101,32 +124,32 @@ class player_entity : public box_entity {
 
             animators.at(0).flipSprite = facingLeft;
             if (!bottomCollider) {
-                if (animators.at(0).name == "tick-stand" || animators.at(0).name == "tick-run") {
+                if (animators.at(0).name == stand_name || animators.at(0).name == run_name) {
                     wrld::sound_mgr.play("jump");
                 }
-                animators.at(0).name = "tick-fall";
+                animators.at(0).name = fall_name;
                 animators.at(0).animated = false;
                 animators.at(0).frame = 0;
                 hasChanged = true;
             }
             else if (!running) {
-                if (animators.at(0).name == "tick-fall") {
+                if (animators.at(0).name == fall_name) {
                     wrld::sound_mgr.play("jump");
                 }
-                animators.at(0).name = "tick-stand";
+                animators.at(0).name = stand_name;
                 animators.at(0).animated = false;
                 animators.at(0).frame = 0;
                 hasChanged = true;
             }
             else {
-                if (animators.at(0).name == "tick-fall") {
+                if (animators.at(0).name == fall_name) {
                     wrld::sound_mgr.play("jump");
                 }
                 stepSoundCounter -= delta_time;
                 if (hasChanged && (animators.at(0).frame == 0 || animators.at(0).frame == 3)) {
                     wrld::sound_mgr.play("walk");
                 }
-                animators.at(0).name = "tick-run";
+                animators.at(0).name = run_name;
                 animators.at(0).animated = true;
                 hasChanged = true;
             }
@@ -141,6 +164,7 @@ class player_entity : public box_entity {
             if (pressingJump && !justJumped && (bottomCollider || grace)) {
                 holdingJump = true;
                 justJumped = true;
+                wrld::jump_counter++;
             }
 
             if (pressingJump) {
@@ -150,7 +174,7 @@ class player_entity : public box_entity {
                 }
             }
             else holdingJump = false;
-            if (bottomCollider && jumpLoad < 1.0 && !holdingJump) {
+            if ((bottomCollider) && jumpLoad < 1.0 && !holdingJump) {
                 justJumped = false;
                 jumpLoad = 1.0;
             }
