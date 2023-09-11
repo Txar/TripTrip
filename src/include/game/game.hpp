@@ -24,7 +24,7 @@ class game {
         ui ui_mgr;
     
     public:
-        game(bool _debug = false) : screen_mgr("TripTrip", 1280, 720), ui_mgr(true) {
+        game(bool _debug = false) : screen_mgr("TripTrip v1.0", 1280, 720), ui_mgr(true) {
             wrld::ui_mgr = &ui_mgr;
             debug = _debug;
             w.block_mgr.load_level("tutorial");
