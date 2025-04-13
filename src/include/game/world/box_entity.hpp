@@ -59,6 +59,11 @@ class box_entity : public entity {
             topCollider = colliders.at(2).second;
             bottomCollider = colliders.at(3).second;
 
+            if (leftCollider && rightCollider) {
+                std::cout << "BLOK\n";
+                y--;
+            }
+
             previousVelocity = velocity;
             if (applyGravity) applyForce({0, wrld::G * mass}, delta_time);
             if (doApplyMovement) applyMovement(delta_time);

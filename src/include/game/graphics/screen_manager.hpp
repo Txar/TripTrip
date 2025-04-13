@@ -150,10 +150,9 @@ class screen_manager {
             sf::Vector2f c = camera.getCenter();
             if (drawBackgrounds) {
                 for (int i = 0; i < (int) background_sprites.size(); i++) {
-                    sf::FloatRect r = {c.x - screen_width/2, wrld::BLOCK_SIZE * wrld::WORLD_HEIGHT - BACKGROUND_SCALING * 128, (float) screen_width + wrld::BLOCK_SIZE * 2, (float) screen_height};
+                    sf::FloatRect r = {(float)(1.0/((0.5 * i) + 1.5)) * (c.x - screen_width/2), wrld::BLOCK_SIZE * wrld::WORLD_HEIGHT - BACKGROUND_SCALING * 128, (float) screen_width + wrld::BLOCK_SIZE * 2, (float) screen_height};
                     sf::Sprite *s = &background_sprites.at(i);
                     s->setScale(BACKGROUND_SCALING, BACKGROUND_SCALING);
-                    r.left = r.left - r.left * sqrt(sqrt(sqrt((i * i) + 1))) - wrld::BLOCK_SIZE;
                     s->setPosition((float)r.left, (float)r.top);
                     //s->setTextureRect(sf::IntRect(r));
                     window.draw(*s);
